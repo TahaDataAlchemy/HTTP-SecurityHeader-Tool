@@ -1,27 +1,26 @@
+#python3 Typer.py domains.txt --output-json SecHeaderScan.json --output-txt SecHeaderScan.txt
+
 import requests
 import json
 import typer
-from pathlib import Path
 
 app = typer.Typer()
 
-def scan_for_security_header(input_file: str):
+def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.json", output_txt: str = "SecHeaderScan.txt"):
     """
-    Scans domains from a text file for security headers and outputs the results to JSON and text files in the same directory as the input file.
+    Scans domains from a text file for security headers and outputs the results to JSON and text files.
     
     Args:
         input_file (str): Path to the input .txt file containing domain names.
+        output_json (str): Path to the output JSON file (default: SecHeaderScan.json).
+        output_txt (str): Path to the output text file (default: SecHeaderScan.txt).
     """
     try:
-        input_path = Path(input_file)
-        if not input_path.is_file() or input_path.suffix != '.txt':
-            raise ValueError(f"Input file '{input_file}' must exist and be in .txt format")
+        if not input_file.endswith('.txt'):
+            raise ValueError("Input file must be in .txt format")
         
-        output_json = input_path.parent / "SecHeaderScan.json"
-        output_txt = input_path.parent / "SecHeaderScan.txt"
-
         results = {"data": []}
-        with input_path.open("r") as file:
+        with open(input_file, "r") as file:
             for line in file:
                 domain = line.strip()
                 if domain:
@@ -69,7 +68,7 @@ def scan_for_security_header(input_file: str):
             json.dump(results, json_file, indent=4)
         print(f"Results saved to {output_json}")
 
-        # Save results to a TXT file (replicating JSON structure)
+        # Save results to a TXT file
         with open(output_txt, "w") as text_file:
             text_file.write(json.dumps(results, indent=4))
         print(f"Results saved to {output_txt}")
@@ -80,14 +79,20 @@ def scan_for_security_header(input_file: str):
         print(f"Error: {ve}")
 
 @app.command()
-def main(input_file: str = typer.Argument("/home/op/input.txt", help="Input .txt file with domain names")):
+def main(
+    input_file: str = typer.Argument(..., help="Input .txt file with domain names"),
+    output_json: str = typer.Option("SecHeaderScan.json", help="Output .json file for results"),
+    output_txt: str = typer.Option("SecHeaderScan.txt", help="Output .txt file for results")
+):
     """
     CLI entry point for scanning security headers.
 
     Args:
         input_file (str): Input .txt file with domain names.
+        output_json (str): Output .json file for results (default: SecHeaderScan.json).
+        output_txt (str): Output .txt file for results (default: SecHeaderScan.txt).
     """
-    scan_for_security_header(input_file)
+    scan_for_security_header(input_file, output_json, output_txt)
 
 if __name__ == "__main__":
     app()
