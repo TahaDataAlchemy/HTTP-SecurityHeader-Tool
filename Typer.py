@@ -1,5 +1,3 @@
-#python3 Typer.py domains.txt --output-json SecHeaderScan.json --output-txt SecHeaderScan.txt
-
 import requests
 import json
 import typer
@@ -63,14 +61,14 @@ def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.
                     # Add the result for this domain
                     results["data"].append(domain_result)
         
-        # Save results to a JSON file
+        # Save results to a JSON file in single-line string format
         with open(output_json, "w") as json_file:
-            json.dump(results, json_file, indent=4)
+            json_file.write(json.dumps(results, separators=(',', ':')))
         print(f"Results saved to {output_json}")
 
-        # Save results to a TXT file
+        # Save results to a TXT file in single-line string format
         with open(output_txt, "w") as text_file:
-            text_file.write(json.dumps(results, indent=4))
+            text_file.write(json.dumps(results, separators=(',', ':')))
         print(f"Results saved to {output_txt}")
 
     except FileNotFoundError:
