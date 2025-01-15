@@ -1,8 +1,7 @@
-#python Typer.py domains.txt --output-json SecHeaderScan.json --output-txt SecHeaderScan.txt
-
 import requests
 import json
 import typer
+from pathlib import Path
 
 app = typer.Typer()
 
@@ -16,11 +15,12 @@ def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.
         output_txt (str): Path to the output text file (default: SecHeaderScan.txt).
     """
     try:
-        if not input_file.endswith('.txt'):
-            raise ValueError("Input file must be in .txt format")
+        input_path = Path(input_file)
+        if not input_path.is_file() or input_path.suffix != '.txt':
+            raise ValueError(f"Input file '{input_file}' must exist and be in .txt format")
         
         results = {"data": []}
-        with open(input_file, "r") as file:
+        with input_path.open("r") as file:
             for line in file:
                 domain = line.strip()
                 if domain:
@@ -68,7 +68,7 @@ def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.
             json.dump(results, json_file, indent=4)
         print(f"Results saved to {output_json}")
 
-        # Save results to a TXT file
+        # Save results to a TXT file (replicating JSON structure)
         with open(output_txt, "w") as text_file:
             text_file.write(json.dumps(results, indent=4))
         print(f"Results saved to {output_txt}")
@@ -80,7 +80,7 @@ def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.
 
 @app.command()
 def main(
-    input_file: str = typer.Argument(..., help="Input .txt file with domain names"),
+    input_file: str = typer.Argument("/home/op/input.txt", help="Input .txt file with domain names"),
     output_json: str = typer.Option("SecHeaderScan.json", help="Output .json file for results"),
     output_txt: str = typer.Option("SecHeaderScan.txt", help="Output .txt file for results")
 ):
