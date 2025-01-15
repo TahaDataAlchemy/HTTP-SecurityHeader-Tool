@@ -13,10 +13,7 @@ def scan_for_security_header(input_file: str, output_json: str = "SecHeaderScan.
         output_json (str): Path to the output JSON file (default: SecHeaderScan.json).
         output_txt (str): Path to the output text file (default: SecHeaderScan.txt).
     """
-    try:
-        if not input_file.endswith('.txt'):
-            raise ValueError("Input file must be in .txt format")
-        
+    try:        
         results = {"data": []}
         with open(input_file, "r") as file:
             for line in file:
